@@ -17,3 +17,7 @@ int foo2(int arr[10]) {
     }
     return 0;
 }
+
+int bar2(int i, int(*func)(int)) {
+    return func(i);
+}
