@@ -16,8 +16,36 @@ class Foo2RetTy {
 
 typedef CallbackTy = Int32 Function(Int32);
 
-int CallbackImpl(int i) {
-    return i * i;
+class CallbackHandlerStatic {
+    static CallbackHandlerBase? handler_obj = null;
+    CallbackHandlerStatic(h_obj) {
+        handler_obj = h_obj;
+    }
+    static int CallbackHandlerStaticImpl(int i) {
+        return handler_obj!.CallbackHandler(i);
+    }
+    Pointer<NativeFunction<CallbackTy>> getFuncPtr() {
+        return Pointer.fromFunction<CallbackTy>(CallbackHandlerStaticImpl, 0);
+    }
+}
+
+abstract class CallbackHandlerBase {
+    int CallbackHandler(int i);
+    Pointer<NativeFunction<CallbackTy>> getFuncPtr() {
+        return static_handler.getFuncPtr();
+    }
+    static late CallbackHandlerStatic static_handler;
+    CallbackHandlerBase() {
+        static_handler = CallbackHandlerStatic(this);
+    }
+}
+
+class CallbackHandlerImpl extends CallbackHandlerBase {
+    List<int> vals = [];
+    int CallbackHandler(int i) {
+        vals.add(i * i);
+        return i * i;
+    }
 }
 
 class FooInterface {
@@ -80,6 +108,12 @@ void main() {
     var foo2_ret = lib.foo2([0,1,2,3,4,5,6,7,8,9]);
     print("foo2 = ${foo2_ret.arr}");
 
-    var bar2_ret = lib.bar2(3, Pointer.fromFunction<CallbackTy>(CallbackImpl, 0));
+    var callback_handler = CallbackHandlerImpl();
+    var bar2_ret = lib.bar2(3, callback_handler.getFuncPtr());
     print("bar2 = ${bar2_ret}");
+    bar2_ret = lib.bar2(4, callback_handler.getFuncPtr());
+    print("bar2 = ${bar2_ret}");
+    bar2_ret = lib.bar2(5, callback_handler.getFuncPtr());
+    print("bar2 = ${bar2_ret}");
+    print(callback_handler.vals);
 }
