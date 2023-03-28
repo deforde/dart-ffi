@@ -1,14 +1,18 @@
 import 'dart:ffi'; // For FFI
 import 'dart:io'; // For Platform.isX
 
-final DynamicLibrary fooLib = Platform.isLinux
-    ? DynamicLibrary.open('native/libfoo.so')
-    : DynamicLibrary.process();
+class FooInterface {
+    DynamicLibrary fooLib = DynamicLibrary.open("native/libfoo.so");
+    late int Function() foo;
 
-final int Function() foo = fooLib
-    .lookup<NativeFunction<Int32 Function()>>('foo')
-    .asFunction();
+    FooInterface() {
+        foo = fooLib
+            .lookup<NativeFunction<Int32 Function()>>("foo")
+            .asFunction();
+    }
+}
 
 void main() {
-    print("foo() = ${foo()}");
+    var lib = FooInterface();
+    print("foo() = ${lib.foo()}");
 }
