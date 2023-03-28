@@ -8,12 +8,19 @@ class BazRetTy {
     BazRetTy(this.ret, this.i);
 }
 
+class Foo2RetTy {
+    int ret;
+    List<int> arr;
+    Foo2RetTy(this.ret, this.arr);
+}
+
 class FooInterface {
     DynamicLibrary fooLib = DynamicLibrary.open("native/libfoo.so");
 
     late int Function() foo_native;
     late int Function(int) bar_native;
     late int Function(Pointer<Int32>) baz_native;
+    late int Function(Pointer<Int32>) foo2_native;
 
 
     int foo() {
@@ -33,17 +40,32 @@ class FooInterface {
         return BazRetTy(ret, i);
     }
 
+    Foo2RetTy foo2(List<int> arr) {
+        final p = malloc<Int32>(arr.length);
+        p.asTypedList(arr.length).setAll(0, arr);
+        final ret = foo2_native(p);
+        arr = p.asTypedList(arr.length).toList();
+        malloc.free(p);
+        return Foo2RetTy(ret, arr);
+    }
+
     FooInterface() {
         foo_native = fooLib.lookup<NativeFunction<Int32 Function()>>("foo").asFunction();
         bar_native = fooLib.lookup<NativeFunction<Int32 Function(Int32)>>("bar").asFunction();
         baz_native = fooLib.lookup<NativeFunction<Int32 Function(Pointer<Int32>)>>("baz").asFunction();
+        foo2_native = fooLib.lookup<NativeFunction<Int32 Function(Pointer<Int32>)>>("foo2").asFunction();
     }
 }
 
 void main() {
     var lib = FooInterface();
+
     print("foo() = ${lib.foo()}");
     print("bar(1) = ${lib.bar(1)}");
+
     var baz_ret = lib.baz(1);
     print("baz(1) = ${baz_ret.i}");
+
+    var foo2_ret = lib.foo2([0,1,2,3,4,5,6,7,8,9]);
+    print("foo2 = ${foo2_ret.arr}");
 }
