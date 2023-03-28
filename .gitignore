@@ -1,2 +1,4 @@
 *.so
 *.deb
+.dart_tool/
+*.lock

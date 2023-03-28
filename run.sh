@@ -11,4 +11,5 @@ if [[ ! -f dart_2.19.5-1_amd64.deb ]]; then
 fi
 
 make -C native
+dart pub get
 dart main.dart

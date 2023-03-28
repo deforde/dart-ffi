@@ -5,3 +5,8 @@ int foo() {
 int bar(int i) {
     return i + 1;
 }
+
+int baz(int *i) {
+    (*i)++;
+    return 0;
+}
