@@ -56,13 +56,16 @@ class FooInterface {
     late int Function(Pointer<Int32>) baz_native;
     late int Function(Pointer<Int32>) foo2_native;
     late int Function(int, Pointer<NativeFunction<CallbackTy>>) bar2_native;
+    late void Function(Pointer<Uint8>) baz2_native;
 
     int foo() {
-        return foo_native();
+        final ret = foo_native();
+        return ret;
     }
 
     int bar(int i) {
-        return bar_native(i);
+        final ret = bar_native(i);
+        return ret;
     }
 
     BazRetTy baz(int i) {
@@ -87,12 +90,18 @@ class FooInterface {
         return bar2_native(i, callback);
     }
 
+    void baz2(String str) {
+        final c_str = str.toNativeUtf8().cast<Uint8>();
+        return baz2_native(c_str);
+    }
+
     FooInterface() {
         foo_native = fooLib.lookup<NativeFunction<Int32 Function()>>("foo").asFunction();
         bar_native = fooLib.lookup<NativeFunction<Int32 Function(Int32)>>("bar").asFunction();
         baz_native = fooLib.lookup<NativeFunction<Int32 Function(Pointer<Int32>)>>("baz").asFunction();
         foo2_native = fooLib.lookup<NativeFunction<Int32 Function(Pointer<Int32>)>>("foo2").asFunction();
         bar2_native = fooLib.lookup<NativeFunction<Int32 Function(Int32, Pointer<NativeFunction<CallbackTy>>)>>("bar2").asFunction();
+        baz2_native = fooLib.lookup<NativeFunction<Void Function(Pointer<Uint8>)>>("baz2").asFunction();
     }
 }
 
@@ -116,4 +125,6 @@ void main() {
     bar2_ret = lib.bar2(5, callback_handler.getFuncPtr());
     print("bar2 = ${bar2_ret}");
     print(callback_handler.vals);
+
+    lib.baz2("my string");
 }

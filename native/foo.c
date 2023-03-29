@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 int foo() {
     return 42;
 }
@@ -20,4 +22,8 @@ int foo2(int arr[10]) {
 
 int bar2(int i, int(*func)(int)) {
     return func(i);
+}
+
+void baz2(char *str) {
+    puts(str);
 }
