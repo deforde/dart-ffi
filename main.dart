@@ -30,11 +30,11 @@ class CallbackHandlerStatic {
 }
 
 abstract class CallbackHandlerBase {
+    static late CallbackHandlerStatic static_handler;
     int CallbackHandler(int i);
     Pointer<NativeFunction<CallbackTy>> getFuncPtr() {
         return static_handler.getFuncPtr();
     }
-    static late CallbackHandlerStatic static_handler;
     CallbackHandlerBase() {
         static_handler = CallbackHandlerStatic(this);
     }
